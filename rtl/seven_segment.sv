@@ -32,6 +32,7 @@ module seven_segment #(
                 4'hd: segments_active_high = 7'b1011110;  // b,c,d,e,g
                 4'he: segments_active_high = 7'b1111001;  // a,d,e,f,g
                 4'hf: segments_active_high = 7'b1110001;  // a,e,f,g
+                default: segments_active_high = 7'b0;
             endcase
         end
     end

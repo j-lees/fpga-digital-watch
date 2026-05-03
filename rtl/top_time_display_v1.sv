@@ -13,26 +13,26 @@ module top_time_display_v1 #(
     output logic [6:0] HEX0
 );
     localparam A = 2'b00, B = 2'b01, C = 2'b10, D = 2'b11;
+    logic en;
 
-    // Each bit represents a rate. 0100 = 25Hz, 0001 = 50Mhz
-    logic [3:0] rate;
-    logic en = 1;
-    logic tick;
-    logic clk_speed;
+    // Clock digits
     logic [5:0] seconds, minutes;
     logic [4:0] hours;
+
+    // Digits
     logic [3:0] s1, s2, m1, m2, hr1, hr2;
+
     // speed selection logic
+    logic rate1, rate2, rate3;
     always_comb begin
         unique case (SW)
-            A : rate = 4'b1000; 
-            B : rate = 4'b0100;
-            C : rate = 4'b0010;
-            D : rate = 4'b0001;
-            default : rate = 4'b0001;
+            A: en = rate1;
+            B: en = rate2;
+            C: en = rate3; 
+            D: en= 1'b1;
+            default: en = 1'b1;
         endcase
     end
-
     // Module instantiation. vewy long 
     // hms
       hms_counter # (
@@ -44,7 +44,7 @@ module top_time_display_v1 #(
         .W_MINUTES(6),
         .W_SECONDS(6)
     ) hms (
-        .clk(clk_speed),
+        .clk(CLOCK_50),
         .enable(en),
         .hours(hours),
         .minutes(minutes),
@@ -53,29 +53,29 @@ module top_time_display_v1 #(
 
     // 1Hz Rate
     restartable_rate_generator #(
-        .CYCLE_COUNT(CYCLES_PER_SECOND/CYCLES_PER_SECOND)
+        .CYCLE_COUNT(CYCLES_PER_SECOND)
     ) rst1 (
         .clk(CLOCK_50),
-        .run(rate[3]),
-        .tick(tick)
+        .run(1'b1),
+        .tick(rate1)
     );
 
     // 25Hz Rate
     restartable_rate_generator #(
-        .CYCLE_COUNT(CYCLES_PER_SECOND/20_000_000)
+        .CYCLE_COUNT(CYCLES_PER_SECOND/25)
     ) rst2 (
         .clk(CLOCK_50),
-        .run(rate[2]),
-        .tick(tick)
+        .run(1'b1),
+        .tick(rate2)
     );
 
     //1kHz Rate
     restartable_rate_generator #(
-        .CYCLE_COUNT(CYCLES_PER_SECOND/50_000)
+        .CYCLE_COUNT(CYCLES_PER_SECOND/1000)
     ) rst3 (
         .clk(CLOCK_50),
-        .run(rate[1]),
-        .tick(tick)
+        .run(1'b1),
+        .tick(rate3)
     );
 
     // binary to bcd
@@ -89,7 +89,7 @@ module top_time_display_v1 #(
         .ACTIVE_LOW(1)
     ) sec1(
         .digit(s1),
-        .blank(0),
+        .blank('0),
         .segments(HEX0)
     );
 
@@ -98,7 +98,7 @@ module top_time_display_v1 #(
         .ACTIVE_LOW(1)
     ) sec2(
         .digit(s2),
-        .blank(0),
+        .blank('0),
         .segments(HEX1)
     );
 
@@ -107,7 +107,7 @@ module top_time_display_v1 #(
         .ACTIVE_LOW(1)
     ) min1(
         .digit(m1),
-        .blank(0),
+        .blank('0),
         .segments(HEX2)
     );
 
@@ -116,7 +116,7 @@ module top_time_display_v1 #(
         .ACTIVE_LOW(1)
     ) min2(
         .digit(m2),
-        .blank(0),
+        .blank('0),
         .segments(HEX3)
     );
 
@@ -125,7 +125,7 @@ module top_time_display_v1 #(
         .ACTIVE_LOW(1)
     ) hour1(
         .digit(hr1),
-        .blank(0),
+        .blank('0),
         .segments(HEX4)
     );
 
@@ -134,9 +134,7 @@ module top_time_display_v1 #(
         .ACTIVE_LOW(1)
     ) hour2(
         .digit(hr2),
-        .blank(0),
+        .blank('0),
         .segments(HEX5)
     );
-
-    assign clk_speed = rate[0] ? CLOCK_50 : tick;
 endmodule
