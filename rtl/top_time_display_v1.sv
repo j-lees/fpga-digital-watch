@@ -23,6 +23,9 @@ module top_time_display_v1 #(
     logic [3:0] s1, s2, m1, m2, hr1, hr2;
 
     // speed selection logic
+    // The enable pin of the HMS counter is tied to the restartable tick generator
+    // which allows us to control its rate.
+
     logic rate1, rate2, rate3;
     always_comb begin
         unique case (SW)
@@ -33,6 +36,8 @@ module top_time_display_v1 #(
             default: en = 1'b1;
         endcase
     end
+
+
     // Module instantiation. vewy long 
     // hms
       hms_counter # (
@@ -50,6 +55,8 @@ module top_time_display_v1 #(
         .minutes(minutes),
         .seconds(seconds)
     );
+
+
 
     // 1Hz Rate
     restartable_rate_generator #(
@@ -78,11 +85,17 @@ module top_time_display_v1 #(
         .tick(rate3)
     );
 
+
+
+
     // binary to bcd
     binary_to_bcd digsec(.bin({1'b0, seconds}), .ones(s1), .tens(s2));
     binary_to_bcd digmin(.bin({1'b0, minutes}), .ones(m1), .tens(m2));
     binary_to_bcd dighr(.bin({2'b0, hours}), .ones(hr1), .tens(hr2));
     
+
+
+
 
     // Seconds ones
     seven_segment # (
@@ -137,4 +150,5 @@ module top_time_display_v1 #(
         .blank('0),
         .segments(HEX5)
     );
+    
 endmodule

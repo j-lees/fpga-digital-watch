@@ -1,7 +1,7 @@
 `timescale 1ns/1ps
 
 module seven_segment #(
-    parameter int ACTIVE_LOW = 1
+    parameter int ACTIVE_LOW = 0
 ) (
     input logic [3:0] digit,
     input logic blank,
@@ -12,7 +12,7 @@ module seven_segment #(
     assign segments = ACTIVE_LOW != 0 ? ~segments_active_high : segments_active_high;
 
     always_comb begin
-        if (blank) begin
+        if (ACTIVE_LOW) begin
             segments_active_high = 7'b0;
         end else begin
             unique case (digit)

@@ -8,6 +8,6 @@ module rising_edge_detector (
     logic prev;
 
     always_ff @(posedge clk) prev <= sig_in;
-
+    // high when the last cycle was low and the curren signal is high
     assign rise = (~prev && sig_in);
 endmodule
