@@ -12,7 +12,7 @@ module seven_segment #(
     assign segments = ACTIVE_LOW != 0 ? ~segments_active_high : segments_active_high;
 
     always_comb begin
-        if (ACTIVE_LOW) begin
+        if (blank) begin
             segments_active_high = 7'b0;
         end else begin
             unique case (digit)
