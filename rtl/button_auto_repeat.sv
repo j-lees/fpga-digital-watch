@@ -22,7 +22,7 @@ module button_auto_repeat #(
     );
 
     button_hold_detect # (
-        .HOLD_CYCLES(HOLD_CYCLES)
+        .HOLD_CYCLES(HOLD_CYCLES - REPEAT_CYCLES + 1)
     )ubutton(
         .clk(clk), 
         .button(button), 
