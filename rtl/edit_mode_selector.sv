@@ -52,7 +52,7 @@ module edit_mode_selector #(
     );
 
     // Counter runs only while armed and button is pressed
-    assign enable_counter = armed & press;
+    assign enable_counter = armed & press & ~long_press;
 
     // Reset counter whenever disarmed
     assign reset_counter = ~armed;
