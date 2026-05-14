@@ -17,7 +17,9 @@
 `timescale 1ns / 1ps
 
 module user_top #(
-    parameter int CYCLES_PER_SECOND = 50_000_000
+    /* verilator lint_off UNUSEDPARAM */
+    parameter int CYCLES_PER_SECOND = 50_000_00
+    /* verilator lint_off UNUSEDPARAM */
 ) (
     input logic clk,
     input logic [3:0] button,

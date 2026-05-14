@@ -72,7 +72,7 @@ module decimal_display_driver (
             );
 
             seven_segment # (
-                .ACTIVE_LOW(1'b1)
+                .ACTIVE_LOW('1)
             ) u_seven_segment_ones(
                 .digit(ones),
                 .blank(blank_a[i]),
@@ -80,7 +80,7 @@ module decimal_display_driver (
             );
 
             seven_segment # (
-                .ACTIVE_LOW(1'b1)
+                .ACTIVE_LOW('1)
             ) u_seven_segment_tens(
                 .digit(tens),
                 .blank(blank_a[i]),
