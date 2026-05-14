@@ -14,7 +14,7 @@
 //           - KEY[2] Decrements
 
 
-module user_top_watch_v3 #(
+module user_top_watch_v4 #(
 // - - - - - - - - - - - - - - - - - -
 //        Core Functionality
 // - - - - - - - - - - - - - - - - - -
@@ -79,7 +79,7 @@ module user_top_watch_v3 #(
     logic hours_dec;
     logic [4:0] hours;
 
- 
+    
     editable_counter #(
         .N(24) ,
         .WIDTH (5)
@@ -92,12 +92,14 @@ module user_top_watch_v3 #(
         .count(hours)
     );
 
+
     // Derive 1 Hz tick from system clock
+    logic seconds_enable;
     restartable_rate_generator #(
         .CYCLE_COUNT(CYCLES_PER_SECOND)
     ) u_divider_1_Hz (
         .clk(clk),
-        .run(1'b1),
+        .run(seconds_enable),
         .tick(seconds_tick)
     );
 
@@ -175,5 +177,11 @@ module user_top_watch_v3 #(
     // Hours Edit Logic
     assign hours_dec = button0rise && hours_edit ? 1'b1 : 1'b0;
     assign hours_inc = button1rise && hours_edit ? 1'b1 : 1'b0;
+
+    // - - - - - - - - - - - - - - - - - -
+    //  Seconds start ticking one seconds after editing
+    // - - - - - - - - - - - - - - - - - -
+
+    assign seconds_enable = ~seconds_edit;
 
 endmodule

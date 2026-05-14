@@ -7,7 +7,7 @@ module button_hold_detect # (
     input logic button,
     output logic held
 );
-    localparam int CountMax = HOLD_CYCLES; 
+    localparam int CountMax = HOLD_CYCLES - 1; 
     localparam int CountWidth = $clog2(CountMax + 1);
 
     logic count_rst;
@@ -24,10 +24,12 @@ module button_hold_detect # (
         .count(count)
     );
 
+    logic next_button;
 
+    always_ff @(posedge clk) next_button <= button; 
 
     always_comb begin
-        if (button) begin
+        if (next_button) begin
             count_rst = 1'b0;
             if (count == CountWidth'(CountMax)) begin
                 count_enable = 1'b0;

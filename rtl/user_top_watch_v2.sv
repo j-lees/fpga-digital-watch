@@ -118,7 +118,7 @@ module user_top_watch_v2 #(
 
     // - - - - - - - - - - - - - - - - - -
     //          Mode Selection
-    // - - - - - - - - - - - - - - - - - -
+    // - - - - - - - - - - - - - - - - - -.
     logic [2:0] mode_enable;
     edit_mode_selector # (
         .HOLD_CYCLES(CYCLES_PER_SECOND)
@@ -137,11 +137,11 @@ module user_top_watch_v2 #(
         .DUTY_CYCLES(CYCLES_PER_SECOND/10)
     ) u_pwm_generator (
         .clk(clk),
-        .rst(button[3]),
+        .rst(1'b0),
         .pwm_out(pwm_out)
     );
 
-    assign blank_seconds = seconds_edit && pwm_out;
+    assign blank_seconds = seconds_edit &&  pwm_out;
     assign blank_minutes = minutes_edit && pwm_out;
     assign blank_hours = hours_edit && pwm_out;
 
