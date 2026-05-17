@@ -1,10 +1,11 @@
 `timescale 1ns / 1ps
 
-module up_down_counter #(
+module up_down_counter_rst #(
     parameter int MAX   = 2,
     parameter int WIDTH = 2
 ) (
     input logic clk,
+    input logic rst,
     input logic enable,
     input logic up,
     output logic [WIDTH - 1:0] count
@@ -16,15 +17,16 @@ module up_down_counter #(
   initial count = '0;
   logic [WIDTH-1:0] next_count;
 
-  //ff
-  always_ff @(posedge clk) if (enable) count <= next_count;
+  always_ff @(posedge clk)
+    if (rst) count <= WIDTH'(0);
+    else if (enable) count <= next_count;
 
-  // next state logic
   always_comb begin
-    if (up) begin
+    if (up)
       if (count < Max) next_count = count + WIDTH'(1);
       else next_count = WIDTH'(0);
-    end else if (count > 0) next_count = count - 1'b1;
+    else if (count > 0) next_count = count - 1'b1;
     else next_count = WIDTH'(Max);
   end
+
 endmodule
