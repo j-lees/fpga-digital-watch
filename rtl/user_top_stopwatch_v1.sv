@@ -3,7 +3,7 @@
 // modify it.
 //
 // This file also serves as a template for your own designs. To use
-// it:
+// it:2
 //   1. Copy the entire contents into a new file with a descriptive
 //      name.
 //   2. Delete the test logic below and replace it with your own

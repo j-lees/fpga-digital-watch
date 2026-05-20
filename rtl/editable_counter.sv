@@ -29,7 +29,7 @@ module editable_counter #(
   wire dec_event = edit_mode && dec && !inc;
   wire tick_event = !edit_mode && tick;
 
-  assign up = edit_mode ? inc_event ? 1'b1 : dec_event ? 1'b0 : 1'b1 : 1'b1;
+  assign up = dec_event ? 1'b0 : 1'b1;
 
   assign enable = tick_event || inc_event || dec_event;
 
