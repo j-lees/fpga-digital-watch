@@ -9,6 +9,7 @@ module mod_n_counter #(
     input logic enable,
     output logic [WIDTH-1:0] count
 );
+
   localparam logic [WIDTH-1:0] Max = WIDTH'(N - 1);
   logic [WIDTH-1:0] next_count;
   initial count = 0;

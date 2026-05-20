@@ -200,7 +200,7 @@ module user_top_timer_v1 #(
   logic button0startstop;
   rising_edge_detector u_button0_startstop (
       .clk(clk),
-      .sig_in(),
+      .sig_in(button[0] && mode_enable == 3'b000),  // start/stop only when not in edit mode
       .rise(button0startstop)
   );
   logic next_running;
