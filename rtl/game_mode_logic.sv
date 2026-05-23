@@ -6,16 +6,30 @@ module game_mode_logic #(
     parameter logic [9:0] LEVEL_DESIGN = 10'b0101010010 // number stream fed into shift register to generate obsticles
 ) (
     input logic clk,
-    input logic rst,
-    input logic button,
-    output logic [9:0] low_level,
-    output logic player_position,
-    output logic [3:0] score,
-    output logic blank,
-    output logic death
+    /* verilator lint_on UNUSEDSIGNAL */
+    input logic [3:0] button,
+    /* verilator lint_off UNUSEDSIGNAL */
+    output logic blank_seconds,
+    output logic blank_minutes,
+    output logic blank_hours,
+    output logic [6:0] SecondsDisplay,
+    output logic [6:0] MinutesDisplay,
+    output logic [6:0] HoursDisplay
 );
-  assign blank = rst || (score == 4'd9); // Blank the display when player dies (score reaches 9) or when reset is active
+  logic blank;
+  logic rst;
+  logic [9:0] low_level;
+  logic death;
+  logic player_position;
+  logic [3:0] score;
+  logic display_blank;
+  assign rst = button[1];
+  assign blank = rst || (score == 4'd9) || display_blank; // Blank the display when player dies (score reaches 9) or when reset is active
   // Score Counter
+
+  assign blank_seconds = blank;
+  assign blank_minutes = blank;
+  assign blank_hours = blank;
   mod_n_counter #(
       .N(10),
       .WIDTH(4)
@@ -65,16 +79,19 @@ module game_mode_logic #(
   end
 
   // Player control
-  logic buttonrise;
-
-  rising_edge_detector u_button_edge (
+  logic [1:0] jump_timer;
+  mod_n_counter #(
+      .N(2),
+      .WIDTH(2)
+  ) u_jump_counter (
       .clk(clk),
-      .sig_in(button),
-      .rise(buttonrise)
+      .rst(death || rst),
+      .enable(shift_reg_tick && button[0]),  // Increment score when obsticle reaches player and player is in the air
+      .count(jump_timer)
   );
 
   always_ff @(posedge clk) begin
-    if (buttonrise) begin
+    if (button[0] && (jump_timer < 2'd2)) begin
       player_position <= 1'b1;  // Player jumps when button is pressed
     end else begin
       player_position <= 1'b0;  // Player is on the ground otherwise
@@ -86,6 +103,17 @@ module game_mode_logic #(
       .clk(clk),
       .sig_in(low_level[8] && (!player_position)),
       .rise(death)
+  );
+
+  game_mode_display_driver u_game_display (
+      .score(score),
+      .low_level(low_level),
+      .player_position(player_position),
+      .death(death),
+      .blank(display_blank),
+      .SecondsDisplay(SecondsDisplay),
+      .MinutesDisplay(MinutesDisplay),
+      .HoursDisplay(HoursDisplay)
   );
 
 endmodule

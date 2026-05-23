@@ -33,7 +33,11 @@ module wave_game_mode_logic;
     rst = 0;
     #100 button = 1;
     #10 button = 0;
-    #2000
+    #2000 button = 1;
+    #100 button = 0;
+    #200
+
+
 
     // --- Normal operation: watch counts for ~1.5 simulated seconds ---
     // seconds_disp advances once every 50 cycles; all blank_* remain 0.

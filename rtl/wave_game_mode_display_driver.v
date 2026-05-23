@@ -8,19 +8,11 @@ module wave_game_mode_display_driver;
   // 10'b0100000000 when jumps, but 10'b0000000000 when on ground
   logic player_position;  //0 = ground, 1 = air
   logic blank;  // blanks for 1 second when player dies
+  logic death;
+  logic [6:0] SecondsDisplay;
+  logic [6:0] MinutesDisplay;
+  logic [6:0] HoursDisplay;
 
-  logic [6:0] HEX0;
-  logic [6:0] HEX1;
-  logic [6:0] HEX2;
-  logic [6:0] HEX3;
-  logic [6:0] HEX4;
-  logic [6:0] HEX5;
-
-  // CYCLES_PER_SECOND=50 keeps the simulation concise:
-  //   1 simulated second  = 50 cycles  = 500 ns
-  //   PWM period (0.5 s)  = 25 cycles  = 250 ns  (2 Hz flash)
-  //   PWM high (0.1 s)    =  5 cycles  =  50 ns  (display off, 20% of period)
-  //   Hold threshold (1s) = 50 cycles  = 500 ns
   game_mode_display_driver dut (
       .score(score),  // Score to be displayed on one 7-segment display (0-9)
       .low_level(low_level), // horisontal positions of everthing on the ground level. eg 2 obsticles and player
@@ -29,13 +21,10 @@ module wave_game_mode_display_driver;
       // 10'b0100000000 when jumps, but 10'b0000000000 when on ground
       .player_position(player_position),  //0 = ground, 1 = air
       .blank(blank),  // blanks for 1 second when player dies
-
-      .HEX0(HEX0),
-      .HEX1(HEX1),
-      .HEX2(HEX2),
-      .HEX3(HEX3),
-      .HEX4(HEX4),
-      .HEX5(HEX5)
+      .death(death),
+      .SecondsDisplay(SecondsDisplay),
+      .MinutesDisplay(MinutesDisplay),
+      .HoursDisplay(HoursDisplay)
   );
 
   always #5 clk = ~clk;  // 100 MHz: 10 ns period
@@ -48,7 +37,8 @@ module wave_game_mode_display_driver;
     // seconds_disp advances once every 50 cycles; all blank_* remain 0.
     low_level = 10'b0100000010;
     score = 0;
-    blank = 0;
+    death = 0;
+
     player_position = 0;  // on the ground
     #100;
     low_level = 10'b0100000100;
@@ -68,6 +58,9 @@ module wave_game_mode_display_driver;
     #100;
     low_level = 10'b0100000100;
     #100;
+    death = 1'b1;
+    #100;
+    death = 1'b0;
     score = 1;
     low_level = 10'b1100001000;
     player_position = 0;
