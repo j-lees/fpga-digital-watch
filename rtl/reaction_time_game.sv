@@ -2,7 +2,7 @@
 
 module reaction_time_game #(
     /* verilator lint_off UNUSEDPARAM */
-    parameter int CYCLES_PER_SECOND = 50_000_00
+    parameter int CYCLES_PER_SECOND = 50_000_000
     /* verilator lint_off UNUSEDPARAM */
 ) (
     input logic clk,
@@ -21,13 +21,13 @@ module reaction_time_game #(
 );
   localparam logic [1:0] Standby = 2'b00, Delaying = 2'b01, TimerRunning = 2'b10;
 
-  assign blank_hours   = !delay_running;
-  assign blank_minutes = !delay_running;
-  assign blank_seconds = !delay_running;
+  assign blank_hours   = delay_running;
+  assign blank_minutes = delay_running;
+  assign blank_seconds = delay_running;
 
-  logic [6:0] centiseconds;
+  logic [6:0] milliseconds;
+  logic [3:0] milliseconds_carry;
   logic [5:0] seconds;
-  logic [6:0] minutes;
   logic delay_running;
   logic reaction_rst;
   logic reaction_enable;
@@ -102,18 +102,18 @@ module reaction_time_game #(
   end
 
   // Stopwatch counter
-  stopwatch_counter #(
+  reaction_time_counter #(
       .CYCLES_PER_SECOND(CYCLES_PER_SECOND)
   ) u_counter (
       .clk(clk),
       .rst(state == Delaying),
       .enable(reaction_enable),
-      .centiseconds(centiseconds),
-      .minutes(minutes),
-      .seconds(seconds)
+      .seconds(seconds), // seconds 0-59
+      .milliseconds_carry(milliseconds_carry), // hundreds column 0-9
+      .milliseconds(milliseconds) // ones tens column 0-99
   );
 
-  assign seconds_disp = centiseconds;
-  assign minutes_disp = {1'b0, seconds};
-  assign hours_disp   = minutes;
+  assign seconds_disp = milliseconds;
+  assign minutes_disp = {3'b0, milliseconds_carry};
+  assign hours_disp   = {1'b0, seconds};
 endmodule
