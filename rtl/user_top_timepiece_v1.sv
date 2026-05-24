@@ -33,8 +33,8 @@ module user_top_timepiece_v1 #(
   // TODO: instantiate user_top_watch_v4, user_top_timer_v1, user_top_stopwatch_v1
   // Connect ports to appropriate ui_in and ui_out (e.g., .button(watch_in.button))
 
-  ui_in_t ui_top_in, ui_top_in_no_buttons, watch_in, timer_in, stopwatch_in;
-  ui_out_t ui_top_out, watch_out, timer_out, stopwatch_out;
+  ui_in_t ui_top_in, ui_top_in_no_buttons, watch_in, timer_in, stopwatch_in, game_in;
+  ui_out_t ui_top_out, watch_out, timer_out, stopwatch_out, game_out;
 
   user_top_watch_v4 #(
       .CYCLES_PER_SECOND(CYCLES_PER_SECOND)
@@ -81,6 +81,22 @@ module user_top_timepiece_v1 #(
       .blank_seconds(stopwatch_out.blank_seconds)
   );
 
+  reaction_time_game #(
+      .CYCLES_PER_SECOND(CYCLES_PER_SECOND)
+  ) u_reaction_time_game (
+      .clk(clk),
+      .button(game_in.button),
+      .sw(game_in.sw),
+      .led(game_out.led),
+      .hours_disp(game_out.hours_disp),
+      .minutes_disp(game_out.minutes_disp),
+      .seconds_disp(game_out.seconds_disp),
+      .blank_hours(game_out.blank_hours),
+      .blank_minutes(game_out.blank_minutes),
+      .blank_seconds(game_out.blank_seconds)
+  );
+
+
   assign ui_top_in.sw                = sw;
   assign ui_top_in.button            = button;
   assign ui_top_in_no_buttons.sw     = sw;
@@ -105,6 +121,7 @@ module user_top_timepiece_v1 #(
         timer_in = ui_top_in_no_buttons;
         watch_in = ui_top_in_no_buttons;
         ui_top_out = stopwatch_out;
+        game_in = ui_top_in_no_buttons;
       end
       // Timer
       2'b11: begin
@@ -112,6 +129,15 @@ module user_top_timepiece_v1 #(
         stopwatch_in = ui_top_in_no_buttons;
         watch_in = ui_top_in_no_buttons;
         ui_top_out = timer_out;
+        game_in = ui_top_in_no_buttons;
+      end
+      // Reaction time game
+      2'b10: begin
+        timer_in = ui_top_in_no_buttons;
+        stopwatch_in = ui_top_in_no_buttons;
+        watch_in = ui_top_in_no_buttons;
+        game_in = ui_top_in;
+        ui_top_out = game_out;
       end
       // Watch
       default: begin
@@ -119,6 +145,7 @@ module user_top_timepiece_v1 #(
         timer_in = ui_top_in_no_buttons;
         stopwatch_in = ui_top_in_no_buttons;
         ui_top_out = watch_out;
+        game_in = ui_top_in_no_buttons;
       end
     endcase
   end
